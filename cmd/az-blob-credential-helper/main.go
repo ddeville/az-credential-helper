@@ -1,75 +1,17 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"os"
 	"strings"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
-	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/ddeville/az-credential-helper/pkg"
 )
 
-const scope string = "https://storage.azure.com/.default"
-const hostSuffix string = ".blob.core.windows.net"
-
-func getAzureAccessToken() (*azcore.AccessToken, error) {
-	var creds []azcore.TokenCredential
-	var errs []error
-
-	// Create the chain manually so that we can exclude managed identity credentials since it seems to
-	// return a useless token even when run locally from a docker base image...
-
-	envCred, err := azidentity.NewEnvironmentCredential(nil)
-	if err == nil {
-		creds = append(creds, envCred)
-	} else {
-		errs = append(errs, fmt.Errorf("failed to create EnvironmentCredential: %v", err))
-	}
-
-	wiCred, err := azidentity.NewWorkloadIdentityCredential(nil)
-	if err == nil {
-		creds = append(creds, wiCred)
-	} else {
-		errs = append(errs, fmt.Errorf("failed to create WorkloadIdentityCredential: %v", err))
-	}
-
-	azCred, err := azidentity.NewAzureCLICredential(nil)
-	if err == nil {
-		creds = append(creds, azCred)
-	} else {
-		errs = append(errs, fmt.Errorf("failed to create AzureCLICredential: %v", err))
-	}
-
-	azdCred, err := azidentity.NewAzureDeveloperCLICredential(nil)
-	if err == nil {
-		creds = append(creds, azdCred)
-	} else {
-		errs = append(errs, fmt.Errorf("failed to create AzureDeveloperCLICredential: %v", err))
-	}
-
-	if len(creds) == 0 {
-		return nil, errors.Join(errs...)
-	}
-
-	chain, err := azidentity.NewChainedTokenCredential(creds, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create ChainedTokenCredential: %w", err)
-	}
-
-	token, err := chain.GetToken(context.Background(), policy.TokenRequestOptions{
-		Scopes: []string{scope},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve token: %w", err)
-	}
-
-	return &token, nil
-}
+const Scope string = "https://storage.azure.com/.default"
+const HostSuffix string = ".blob.core.windows.net"
 
 func fail(msg string) {
 	fmt.Fprintln(os.Stderr, msg)
@@ -98,11 +40,11 @@ func main() {
 	if err != nil {
 		fail(fmt.Sprintf("Invalid uri: %v", err))
 	}
-	if !strings.HasSuffix(parsed.Host, hostSuffix) {
-		fail(fmt.Sprintf("Unexpected host in URI: %s. Should be: *%s", parsed.Host, hostSuffix))
+	if !strings.HasSuffix(parsed.Host, HostSuffix) {
+		fail(fmt.Sprintf("Unexpected host in URI: %s. Should be: *%s", parsed.Host, HostSuffix))
 	}
 
-	accessToken, err := getAzureAccessToken()
+	accessToken, err := pkg.GetAzureAccessToken(Scope)
 	if err != nil {
 		fail(fmt.Sprintf("Failed to retrieve token from azure: %v", err))
 	}
