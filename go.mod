@@ -5,6 +5,7 @@ go 1.23.4
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.1
+	github.com/docker/docker-credential-helpers v0.8.2
 	github.com/spf13/cobra v1.8.1
 )
 

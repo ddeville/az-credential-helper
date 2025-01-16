@@ -23,10 +23,8 @@ var rootCmd = &cobra.Command{
 
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "retrieve credentials for the storage account passed as json via stdout.",
-	Run: func(cmd *cobra.Command, args []string) {
-		get()
-	},
+	Short: "retrieve credentials for the storage account passed as json via stdin.",
+	Run:   func(cmd *cobra.Command, args []string) { get() },
 }
 
 func init() {
