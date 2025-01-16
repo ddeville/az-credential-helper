@@ -24,4 +24,6 @@ jobs:
         goversion: "https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz"
         project_path: "./cmd/az-blob-credential-helper"
         binary_name: "az-blob-credential-helper"
+        compress_assets: FALSE
         sha256sum: TRUE
+        md5sum: FALSE
