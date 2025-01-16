@@ -7,20 +7,33 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/ddeville/az-credential-helper/pkg"
 )
 
-const scope string = "https://storage.azure.com/.default"
-const hostSuffix string = ".blob.core.windows.net"
+const (
+	scope      string = "https://storage.azure.com/.default"
+	hostSuffix string = ".blob.core.windows.net"
+)
 
-func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Missing command")
-	}
-	if strings.TrimSpace(os.Args[1]) != "get" {
-		log.Fatalf("Invalid command: %s. Allowed commands: get", os.Args[1])
-	}
+var rootCmd = &cobra.Command{
+	Use: "az-blob-credential-helper",
+}
 
+var getCmd = &cobra.Command{
+	Use:   "get",
+	Short: "retrieve credentials for the storage account passed as json via stdout.",
+	Run: func(cmd *cobra.Command, args []string) {
+		get()
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(getCmd)
+}
+
+func get() {
 	var req struct {
 		URI string `json:"uri"`
 	}
@@ -36,12 +49,12 @@ func main() {
 		log.Fatalf("Invalid uri: %v", err)
 	}
 	if !strings.HasSuffix(parsed.Host, hostSuffix) {
-		log.Fatalf("Unexpected host in URI: %s. Should be: *%s", parsed.Host, hostSuffix)
+		log.Fatalf("Unexpected host: %s should end with %s", parsed.Host, hostSuffix)
 	}
 
 	accessToken, err := pkg.GetAzureAccessToken(scope)
 	if err != nil {
-		log.Fatalf("Failed to retrieve token from azure: %v", err)
+		log.Fatalf("Failed to retrieve token: %v", err)
 	}
 
 	res := map[string]map[string][]string{
@@ -50,8 +63,13 @@ func main() {
 			"x-ms-version":  {"2024-05-04"},
 		},
 	}
-	enc := json.NewEncoder(os.Stdout)
-	if err := enc.Encode(res); err != nil {
+	if err := json.NewEncoder(os.Stdout).Encode(res); err != nil {
 		log.Fatalf("Failed to write response: %v", err)
+	}
+}
+
+func main() {
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatalf("Failed to run command: %v", err)
 	}
 }
