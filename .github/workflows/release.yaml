@@ -7,8 +7,8 @@ permissions:
     packages: write
 
 jobs:
-  releases-matrix:
-    name: Release Go Binary
+  releases-matrix-az-blob-credential-helper:
+    name: release az-blob-credential-helper
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,6 +24,26 @@ jobs:
         goversion: "https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz"
         project_path: "./cmd/az-blob-credential-helper"
         binary_name: "az-blob-credential-helper"
+        compress_assets: FALSE
+        sha256sum: TRUE
+        md5sum: FALSE
+  releases-matrix-docker-credential-acr-login:
+    name: release docker-credential-acr-login
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, darwin]
+        goarch: [amd64, arm64]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: wangyoucao577/go-release-action@v1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        goversion: "https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz"
+        project_path: "./cmd/docker-credential-acr-login"
+        binary_name: "docker-credential-acr-login"
         compress_assets: FALSE
         sha256sum: TRUE
         md5sum: FALSE
