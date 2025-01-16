@@ -6,6 +6,9 @@ permissions:
     contents: write
     packages: write
 
+env:
+    GOVERSION: "https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz"
+
 jobs:
   releases-matrix-az-blob-credential-helper:
     name: release az-blob-credential-helper
@@ -21,7 +24,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goversion: "https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz"
+        goversion: ${{ env.GOVERSION }}
         project_path: "./cmd/az-blob-credential-helper"
         binary_name: "az-blob-credential-helper"
         compress_assets: FALSE
@@ -41,7 +44,7 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goversion: "https://dl.google.com/go/go1.23.4.linux-amd64.tar.gz"
+        goversion: ${{ env.GOVERSION }}
         project_path: "./cmd/docker-credential-acr-login"
         binary_name: "docker-credential-acr-login"
         compress_assets: FALSE
