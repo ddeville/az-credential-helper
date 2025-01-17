@@ -34,8 +34,18 @@ func GetDockerCredentials(serverURL string) (*DockerCredentials, error) {
 	}
 
 	registry := registryURL.Hostname()
+
+	// NOTE: short-circuit if we find a dockerhub registry, so that we don't fail matching
+	// it against an ACR hostname and get docker to error. This implies that setting this
+	// credential helper will prevent private repos on docker.io since docker doesn't support
+	// wildcards in `credHelpers` which forces us to use `credsStore` when dealing with a lot
+	// of different ACR registries.
+	if registry == "index.docker.io" {
+		return &DockerCredentials{}, nil
+	}
+
 	if !strings.HasSuffix(registry, registrySuffix) {
-		return nil, fmt.Errorf("non-acr registry: %s", registry)
+		return nil, fmt.Errorf("non-acr registry: %s", serverURL)
 	}
 
 	accessToken, err := GetAzureAccessToken(scope)
