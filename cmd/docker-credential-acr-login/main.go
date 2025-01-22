@@ -10,11 +10,6 @@ import (
 	"github.com/ddeville/az-credential-helper/pkg"
 )
 
-const (
-	scope      string = "https://storage.azure.com/.default"
-	hostSuffix string = ".blob.core.windows.net"
-)
-
 var rootCmd = &cobra.Command{
 	Use: "docker-credential-acr-login",
 }
