@@ -1,0 +1,16 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "pkg",
+    srcs = [
+        "acr.go",
+        "cred.go",
+    ],
+    importpath = "github.com/ddeville/az-credential-helper/pkg",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_azure_azure_sdk_for_go_sdk_azcore//:azcore",
+        "@com_github_azure_azure_sdk_for_go_sdk_azcore//policy",
+        "@com_github_azure_azure_sdk_for_go_sdk_azidentity//:azidentity",
+    ],
+)
