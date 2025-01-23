@@ -13,6 +13,7 @@ go_library(
 
 go_binary(
     name = "az-blob-credential-helper",
+    out = "az-blob-credential-helper",
     embed = [":az-blob-credential-helper_lib"],
     visibility = ["//visibility:public"],
 )
